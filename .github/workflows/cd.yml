@@ -2,14 +2,14 @@ name: Build and Release
 on:
   push:
     branches:
-      - fix
+      - master
 
 env:
   PROPERTIES_PATH: "./android/key.properties"
 
 jobs:
   build-and-release-artifacts:
-    if: ${{github.ref == 'refs/heads/fix'}}
+    if: ${{github.ref == 'refs/heads/master'}}
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3.1.0
