@@ -1,0 +1,51 @@
+name: Build and Release
+on:
+  push:
+    branches:
+      - fix
+
+env:
+  PROPERTIES_PATH: "./android/key.properties"
+
+jobs:
+  build-and-release-artifacts:
+    if: ${{github.ref == 'refs/heads/fix'}}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - name: "Setup JAVA environment"
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.x"
+          channel: 'stable'
+       # Creating the key.properties file
+      - run: |
+          echo keyPassword=\${{ secrets.KEY_PASSWORD }} > ${{env.PROPERTIES_PATH}}
+          echo storePassword=\${{ secrets.STORE_PASSWORD }} >> ${{env.PROPERTIES_PATH}}
+          echo keyAlias=\${{ secrets.KEY_ALIAS }} >> ${{env.PROPERTIES_PATH}}
+      # Decoding base64 key into a file
+      - name: Decoding base64 KEY
+        run: echo "${{ secrets.STORE_FILE }}" | base64 --decode > ./android/app/upload-keystore.jks
+      - run: flutter pub get
+      # - run: flutter test
+      - run: flutter build apk --release --split-per-abi
+      - name: Build APP BUNDLE
+        run: flutter build appbundle --release
+      # - run: |
+      #     flutter build ios --no-codesign
+      #     cd build/ios/iphoneos
+      #     mkdir Payload
+      #     cd Payload
+      #     ln -s ../Runner.app
+      #     cd ..
+      #     zip -r app.ipa Payload
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/app/outputs/flutter-apk/*, build/app/outputs/bundle/release/*.aab, build/ios/iphoneos/app.ipa"
+          tag: v1.0.${{ github.run_number }}
+          token: ${{ secrets.BOOKIRIDE_TOKEN }}
+
