@@ -35,7 +35,7 @@ class _RouteMapState extends State<RouteMap> {
     Future.delayed(
       const Duration(seconds: 2),
       () {
-        var wayPoints = <WayPoint>[];
+        List<WayPoint> wayPoints = <WayPoint>[];
         wayPoints.add(WayPoint(
             name: "Source",
             latitude: widget.trip.route.fromLatitude,
@@ -48,7 +48,7 @@ class _RouteMapState extends State<RouteMap> {
             isSilent: false));
   //adding stop if there is.
         if (widget.trip.route.stops.isNotEmpty) {
-          for (var stop in widget.trip.route.stops) {
+          for (final stop in widget.trip.route.stops) {
             wayPoints.add(
               WayPoint(
                 name: 'stop ${wayPoints.length + 1}',

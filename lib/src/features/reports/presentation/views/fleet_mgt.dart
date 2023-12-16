@@ -110,7 +110,7 @@ class _FleetMgtReportState extends State<FleetMgtReport> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Fleet Mgt Report",
+        title: Text("Incident Report",
             style: Theme.of(context).textTheme.headlineMedium!),
         backgroundColor: bg,
       ),

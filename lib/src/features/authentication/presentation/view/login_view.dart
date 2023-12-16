@@ -60,27 +60,22 @@ class _LoginViewState extends State<LoginView> {
                 key: formKey,
                 child: Column(
                   children: [
-                    TextFormField(
-                      controller: emailController,
-                      validator: (value) => validateEmail(value!),
-                      decoration: InputDecoration(
-                        fillColor: white,
-                        filled: true,
-                        hintText: "example@email.com",
-                        labelText: "Username",
-                        errorStyle: const TextStyle(fontSize: 15),
-                        labelStyle:
-                            Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  backgroundColor: white,
-                                ),
-                        isDense: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
+                     TextFormField(
+                       controller: emailController,
+                       validator: (value) => validateEmail(value!),
+                       decoration: InputDecoration(
+                         fillColor: white,
+                         filled: true,
+                         hintText: "example@email.com",
+                         errorStyle: const TextStyle(fontSize: 15),
+
+                         isDense: true,
+                         border: OutlineInputBorder(
+                           borderRadius: BorderRadius.circular(5),
+                           borderSide: BorderSide.none,
+                         ),
+                       ),
+                     ),
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.02,
                     ),
@@ -97,12 +92,8 @@ class _LoginViewState extends State<LoginView> {
                         fillColor: white,
                         filled: true,
                         errorStyle: const TextStyle(fontSize: 15),
-                        labelText: "Password",
-                        labelStyle:
-                            Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  backgroundColor: white,
-                                ),
+                        hintText: "Password",
+
                         isDense: true,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5),
