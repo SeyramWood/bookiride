@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:record/record.dart';
 import 'package:bookihub/src/features/reports/domain/entities/report_model.dart';
 import 'package:bookihub/src/features/reports/presentation/provider/report_controller.dart';
 import 'package:bookihub/src/shared/utils/button_extension.dart';
@@ -27,9 +26,9 @@ class _FleetMgtReportState extends State<FleetMgtReport> {
   final timeController = TextEditingController();
   final locationController = TextEditingController();
   final descriptionController = TextEditingController();
-  var images = <File>[];
-  var trip = locator<Trip>();
-  late Record audioRecord;
+  List<File> images = <File>[];
+  final trip = locator<Trip>();
+  // late Record audioRecord;
   String statusText = "Record pickup location";
   bool isRecording = false;
   File? recordFile;
@@ -58,13 +57,13 @@ class _FleetMgtReportState extends State<FleetMgtReport> {
 
   @override
   void initState() {
-    audioRecord = Record();
+    // audioRecord = Record();
     super.initState();
   }
 
   @override
   void dispose() {
-    audioRecord.dispose();
+    // audioRecord.dispose();
     super.dispose();
   }
 
