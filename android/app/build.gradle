@@ -22,8 +22,19 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+// apply plugin: 'com.android.application'
+// apply plugin: 'kotlin-android'
+// apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+def keystoreProperties = new Properties()
+   def keystorePropertiesFile = rootProject.file('app/config/key.properties')
+   if (keystorePropertiesFile.exists()) {
+    println("got here")
+       keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
-    namespace "com.bookihub.bookiride"
+    namespace "com.bookihub.ride"
     compileSdkVersion 33
     ndkVersion flutter.ndkVersion
 
@@ -42,7 +53,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.bookihub.bookiride"
+        applicationId "com.bookihub.ride"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 21
@@ -50,14 +61,24 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
-
-    buildTypes {
+    
+    signingConfigs {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+           keyAlias keystoreProperties['keyAlias']
+           keyPassword keystoreProperties['keyPassword']
+           storeFile file(keystoreProperties['storeFile'])
+    println(storeFile)
+           storePassword keystoreProperties['storePassword']
+      
         }
     }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+
+
 }
 
 flutter {
