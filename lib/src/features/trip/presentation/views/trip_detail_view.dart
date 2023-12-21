@@ -333,8 +333,9 @@ class _TripDetailsState extends State<TripDetails> {
                                   showCustomSnackBar(
                                       context, l.message, orange);
                                 }, (r) {
-                                  context.read<TripProvider>().startedDate =
-                                      DateTime.now();
+                                  context
+                                      .read<TripProvider>()
+                                      .startedDate(DateTime.now());
                                   Navigator.push(context, MaterialPageRoute(
                                     builder: (context) {
                                       return TripStartedView(

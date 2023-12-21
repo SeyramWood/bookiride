@@ -35,29 +35,29 @@ class _RouteMapState extends State<RouteMap> {
     Future.delayed(
       const Duration(seconds: 2),
       () {
-        List<WayPoint> wayPoints = <WayPoint>[];
+        var wayPoints = <WayPoint>[];
         wayPoints.add(WayPoint(
             name: "Source",
-            latitude: widget.trip.route.fromLatitude,
-            longitude: widget.trip.route.fromLongitude,
+            latitude: widget.trip.terminal.from.latitude,
+            longitude: widget.trip.terminal.from.longitude,
             isSilent: false));
         wayPoints.add(WayPoint(
             name: "Your destination",
-            latitude: widget.trip.route.toLatitude,
-            longitude: widget.trip.route.toLongitude,
+            latitude: widget.trip.terminal.to.latitude,
+            longitude: widget.trip.terminal.to.longitude,
             isSilent: false));
   //adding stop if there is.
-        if (widget.trip.route.stops.isNotEmpty) {
-          for (final stop in widget.trip.route.stops) {
-            wayPoints.add(
-              WayPoint(
-                name: 'stop ${wayPoints.length + 1}',
-                latitude: stop.latitude,
-                longitude: stop.longitude,
-              ),
-            );
-          }
-        }
+        // if (widget.trip.route.stops.isNotEmpty) {
+        //   for (var stop in widget.trip.route.stops) {
+        //     wayPoints.add(
+        //       WayPoint(
+        //         name: 'stop ${wayPoints.length + 1}',
+        //         latitude: stop.latitude,
+        //         longitude: stop.longitude,
+        //       ),
+        //     );
+        //   }
+        // }
         log(wayPoints.toString());
 
         _isMultipleStop = wayPoints.length > 2;
@@ -113,9 +113,7 @@ class _RouteMapState extends State<RouteMap> {
                 width: 75,
                 height: 55,
                 child: CustomButton(
-                  onPressed: _isNavigating
-                      ? null
-                      : () {
+                  onPressed: () {
                           setState(
                             () {
                               if (_isNavigating) {
