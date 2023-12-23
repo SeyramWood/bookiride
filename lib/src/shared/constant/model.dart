@@ -187,17 +187,21 @@ class Route {
     int id;
     String from;
     String to;
+    List<Stop> stops;
 
     Route({
         required this.id,
         required this.from,
         required this.to,
+    required this.stops,
     });
 
     factory Route.fromJson(Map<String, dynamic> json) => Route(
         id: json["id"],
         from: json["from"],
         to: json["to"],
+        stops: List<Stop>.from(json["stops"]?.map((x) => Stop.fromJson(x))??[]),
+
     );
 
     Map<String, dynamic> toJson() => {
@@ -224,7 +228,7 @@ class Route {
 //     required this.fromLongitude,
 //     required this.toLatitude,
 //     required this.toLongitude,
-//     required this.stops,
+    // required this.stops,
 //   });
 
 //   factory Route.fromJson(Map<String, dynamic> json) => Route(
@@ -235,7 +239,7 @@ class Route {
 //         fromLongitude: json["fromLongitude"]?.toDouble(),
 //         toLatitude: json["toLatitude"]?.toDouble(),
 //         toLongitude: json["toLongitude"]?.toDouble(),
-//         stops: List<Stop>.from(json["stops"].map((x) => Stop.fromJson(x))),
+        // stops: List<Stop>.from(json["stops"].map((x) => Stop.fromJson(x))),
 //       );
 
 //   Map<String, dynamic> toJson() => {

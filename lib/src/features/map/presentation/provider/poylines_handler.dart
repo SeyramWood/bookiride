@@ -23,7 +23,6 @@ getPolyLines({LatLng? pickUp, LatLng? dropOff}) async {
         "https://maps.googleapis.com/maps/api/directions/json?origin=$pickLat%2C$pickLng&destination=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$apiKey";
     var response = await get(Uri.parse(url));
     if (response.statusCode == 200) {
-      print(response.body);
       var steps =
           jsonDecode(response.body)["routes"][0]["overview_polyline"]["points"];
       decodeEncodedPolyLine(encode: steps);
@@ -32,7 +31,7 @@ getPolyLines({LatLng? pickUp, LatLng? dropOff}) async {
     }
   } catch (e) {
     if (e is SocketException) {
-      // print("No Internet connection");
+      print("No Internet connection");
     }
   }
   return polyList;

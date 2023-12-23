@@ -29,7 +29,6 @@ if (flutterVersionName == null) {
 def keystoreProperties = new Properties()
    def keystorePropertiesFile = rootProject.file('app/config/key.properties')
    if (keystorePropertiesFile.exists()) {
-    println("got here")
        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
@@ -62,20 +61,20 @@ android {
         versionName flutterVersionName
     }
     
-    signingConfigs {
-        release {
-           keyAlias keystoreProperties['keyAlias']
-           keyPassword keystoreProperties['keyPassword']
-           storeFile file(keystoreProperties['storeFile'])
-    println(storeFile)
-           storePassword keystoreProperties['storePassword']
+    // signingConfigs {
+    //     release {
+    //        keyAlias keystoreProperties['keyAlias']
+    //        keyPassword keystoreProperties['keyPassword']
+    //        storeFile file(keystoreProperties['storeFile'])
+    // println(storeFile)
+    //        storePassword keystoreProperties['storePassword']
       
-        }
-    }
+    //     }
+    // }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
         }
     }
 

@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field
+
 import 'dart:developer';
 
 import 'package:bookihub/src/shared/utils/exports.dart';
@@ -22,11 +24,16 @@ class RouteMap extends StatefulWidget {
 }
 
 class _RouteMapState extends State<RouteMap> {
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
   bool _isMultipleStop = false;
+  double? _distanceRemaining, _durationRemaining;
+
   MapBoxNavigationViewController? _controller;
   bool routeBuilt = false;
   bool _isNavigating = false;
   late MapBoxOptions _navigationOption;
+  String? _platformVersion;
+  String? _instruction;
 
   @override
   void initState() {
@@ -41,23 +48,24 @@ class _RouteMapState extends State<RouteMap> {
             latitude: widget.trip.terminal.from.latitude,
             longitude: widget.trip.terminal.from.longitude,
             isSilent: false));
+
+        // adding stop if there is.
+        if (widget.trip.route.stops.isNotEmpty) {
+          for (var stop in widget.trip.route.stops) {
+            wayPoints.add(
+              WayPoint(
+                name: 'stop ${wayPoints.length + 1}',
+                latitude: stop.latitude,
+                longitude: stop.longitude,
+              ),
+            );
+          }
+        }
         wayPoints.add(WayPoint(
             name: "Your destination",
             latitude: widget.trip.terminal.to.latitude,
             longitude: widget.trip.terminal.to.longitude,
             isSilent: false));
-  //adding stop if there is.
-        // if (widget.trip.route.stops.isNotEmpty) {
-        //   for (var stop in widget.trip.route.stops) {
-        //     wayPoints.add(
-        //       WayPoint(
-        //         name: 'stop ${wayPoints.length + 1}',
-        //         latitude: stop.latitude,
-        //         longitude: stop.longitude,
-        //       ),
-        //     );
-        //   }
-        // }
         log(wayPoints.toString());
 
         _isMultipleStop = wayPoints.length > 2;
@@ -76,23 +84,35 @@ class _RouteMapState extends State<RouteMap> {
   }
 
   Future<void> initialize() async {
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
     _navigationOption = MapBoxNavigation.instance.getDefaultOptions();
-    _navigationOption.simulateRoute = false;
+    _navigationOption.simulateRoute = true;
     _navigationOption.language = "en";
-    _navigationOption.enableRefresh = true;
+    //_navigationOption.initialLatitude = 36.1175275;
+    //_navigationOption.initialLongitude = -115.1839524;
+    MapBoxNavigation.instance.registerRouteEventListener(_onEmbeddedRouteEvent);
 
-    MapBoxNavigation.instance.registerRouteEventListener(_onRouteEvent);
-
+    String? platformVersion;
+    // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      await MapBoxNavigation.instance.getPlatformVersion();
+      platformVersion = await MapBoxNavigation.instance.getPlatformVersion();
     } on PlatformException {
-      // Handle the exception if needed
+      platformVersion = 'Failed to get platform version.';
     }
+
+    setState(() {
+      _platformVersion = platformVersion;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       body: Center(
         child: Stack(
           children: <Widget>[
@@ -100,12 +120,13 @@ class _RouteMapState extends State<RouteMap> {
               color: Colors.grey,
               child: MapBoxNavigationView(
                   options: _navigationOption,
-                  onRouteEvent: _onRouteEvent,
+                  onRouteEvent: _onEmbeddedRouteEvent,
                   onCreated: (MapBoxNavigationViewController controller) async {
                     _controller = controller;
                     controller.initialize();
                   }),
             ),
+            if(routeBuilt)
             Positioned(
               top: MediaQuery.of(context).size.height * widget.dimension2,
               left: MediaQuery.of(context).size.width * widget.dimension,
@@ -113,17 +134,11 @@ class _RouteMapState extends State<RouteMap> {
                 width: 75,
                 height: 55,
                 child: CustomButton(
-                  onPressed: () {
-                          setState(
-                            () {
-                              if (_isNavigating) {
-                                _controller?.finishNavigation();
-                              } else {
-                                _controller?.startNavigation();
-                              }
-                            },
-                          );
-                        },
+                  onPressed: routeBuilt && !_isNavigating
+                      ? () {
+                          _controller?.startNavigation();
+                        }
+                      : null,
                   child: const Icon(Icons.navigation),
                 ),
               ),
@@ -134,15 +149,15 @@ class _RouteMapState extends State<RouteMap> {
     );
   }
 
-  Future<void> _onRouteEvent(RouteEvent e) async {
+  Future<void> _onEmbeddedRouteEvent(e) async {
+    _distanceRemaining = await MapBoxNavigation.instance.getDistanceRemaining();
+    _durationRemaining = await MapBoxNavigation.instance.getDurationRemaining();
+
     switch (e.eventType) {
       case MapBoxEvent.progress_change:
         var progressEvent = e.data as RouteProgressEvent;
         if (progressEvent.currentStepInstruction != null) {
-          setState(() {
-            _isNavigating = true;
-            routeBuilt = true;
-          });
+          _instruction = progressEvent.currentStepInstruction;
         }
         break;
       case MapBoxEvent.route_building:
@@ -162,9 +177,6 @@ class _RouteMapState extends State<RouteMap> {
         });
         break;
       case MapBoxEvent.on_arrival:
-        setState(() {
-          _isNavigating = false;
-        });
         if (!_isMultipleStop) {
           await Future.delayed(const Duration(seconds: 3));
           await _controller?.finishNavigation();
@@ -172,13 +184,15 @@ class _RouteMapState extends State<RouteMap> {
         break;
       case MapBoxEvent.navigation_finished:
       case MapBoxEvent.navigation_cancelled:
-        setState(() {
+        scaffoldKey.currentState?.setState(() {
           routeBuilt = false;
           _isNavigating = false;
         });
+
         break;
       default:
         break;
     }
+    setState(() {});
   }
 }
