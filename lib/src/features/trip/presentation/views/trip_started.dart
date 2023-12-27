@@ -89,8 +89,8 @@ class _TripStartedViewState extends State<TripStartedView> {
                 children: [
                   Center(child: injectedMap()),
                   Positioned(
-                      top: MediaQuery.sizeOf(context).height * .5,
-                      left: MediaQuery.sizeOf(context).width * .7,
+                      top: MediaQuery.sizeOf(context).height * .55,
+                      left: MediaQuery.sizeOf(context).width * .73,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(

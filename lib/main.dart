@@ -1,7 +1,6 @@
 import 'package:bookihub/src/features/authentication/presentation/auth_state.dart';
 import 'package:bookihub/src/features/authentication/presentation/dependency/auth_dependencies.dart';
 import 'package:bookihub/src/features/authentication/presentation/provider/auth_provider.dart';
-import 'package:bookihub/src/features/map/presentation/views/map_view.dart';
 import 'package:bookihub/src/features/reports/presentation/dependency/report_dependencies.dart';
 import 'package:bookihub/src/features/trip/presentation/dependency/trip_dependency.dart';
 import 'package:bookihub/src/shared/utils/interceptor.dart';
@@ -12,6 +11,7 @@ import 'src/features/delivery/presentation/dependency/delivery_dependencies.dart
 import 'src/shared/utils/exports.dart';
 
 GetIt locator = GetIt.instance;
+final String apiKey = "AIzaSyA_qBSnevO4T8L2pW2qaCl13WOVPX9Gb9U";
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +46,7 @@ class MainApp extends StatelessWidget {
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: LightTheme.themeData(),
-          home:  RouteMap()),
+          home:  const AuthState()),
     );
   }
 }

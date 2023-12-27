@@ -1,19 +1,24 @@
-// ignore_for_file: unused_field
+// ignore_for_file: unused_element
 
-import 'dart:developer';
+import 'dart:developer' as console;
+import 'dart:math';
 
+import 'package:bookihub/main.dart';
 import 'package:bookihub/src/shared/utils/exports.dart';
-import 'package:flutter_mapbox_navigation/flutter_mapbox_navigation.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../trip/domain/entities/trip_model.dart';
 
 class RouteMap extends StatefulWidget {
-  RouteMap({
+  const RouteMap({
     super.key,
-    this.trip,
+    required this.trip,
     this.dimension = .78,
     this.dimension2 = .601,
   });
-  Trip? trip;
+  final Trip trip;
   final num dimension;
   final num dimension2;
 
@@ -23,285 +28,270 @@ class RouteMap extends StatefulWidget {
 
 class _RouteMapState extends State<RouteMap> {
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
-  bool _isMultipleStop = false;
-  double? _distanceRemaining, _durationRemaining;
-  MapBoxNavigationViewController? _controller;
-  bool _routeBuilt = false;
-  bool _isNavigating = false;
-  bool _inFreeDrive = false;
-  late MapBoxOptions _navigationOption;
-  String? _platformVersion;
-  String? _instruction;
+
+  final Completer<GoogleMapController?> _controller = Completer();
+  Map<PolylineId, Polyline> polylines = {};
+  PolylinePoints polylinePoints = PolylinePoints();
+  Location location = Location();
+  Marker? sourcePosition, destinationPosition;
+  LocationData? _currentPosition;
+  LatLng curLocation = const LatLng(0.0, 0.0);
+  StreamSubscription<LocationData>? locationSubscription;
+  Set<Marker> markers = {};
+  String waypoints = '';
 
   @override
   void initState() {
+    getNavigation();
+    addMarker();
     super.initState();
-
-    /////////////
-    initialise();
-  }
-
-  @override
-  void deactivate() {
-    super.deactivate();
-    offMap();
   }
 
   @override
   void dispose() {
+    locationSubscription?.cancel();
     super.dispose();
-    _controller?.dispose();
   }
 
-  offMap() async {
-    await MapBoxNavigation.instance.finishNavigation();
-  }
-
-  initialise() async {
+  void addMarker() {
     if (!mounted) return;
+    if (mounted) {
+      setState(() {
+        markers.add(Marker(
+          markerId: MarkerId('curLoc_${DateTime.now().millisecondsSinceEpoch}'),
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+          position: curLocation,
+        ));
+        markers.add(Marker(
+          markerId: MarkerId('source_${DateTime.now().millisecondsSinceEpoch}'),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
+          position: LatLng(
+            widget.trip.terminal.from.latitude,
+            widget.trip.terminal.from.longitude,
+          ),
+        ));
+        if (widget.trip.route.stops.isNotEmpty) {
+          for (var stop in widget.trip.route.stops) {
+            markers.add(
+              Marker(
+                markerId: MarkerId('stop ${markers.length + 1}'),
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueRose),
+                position: LatLng(stop.latitude, stop.longitude),
+              ),
+            );
+          }
+        }
 
-    _navigationOption = MapBoxNavigation.instance.getDefaultOptions();
-    _navigationOption.simulateRoute = false;
-    _navigationOption.language = "en";
+        markers.add(Marker(
+          markerId:
+              MarkerId('destination_${DateTime.now().millisecondsSinceEpoch}'),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+          position: LatLng(widget.trip.terminal.to.latitude,
+              widget.trip.terminal.to.longitude),
+        ));
+      });
 
-    final cityhall =
-        WayPoint(name: "City Hall", latitude: 42.886448, longitude: -78.878372);
-    final downtown = WayPoint(
-        name: "Downtown Buffalo", latitude: 42.8866177, longitude: -78.8814924);
-    MapBoxNavigation.instance.registerRouteEventListener(_onEmbeddedRouteEvent);
-
-    var wayPoints = <WayPoint>[];
-    wayPoints.add(cityhall);
-    wayPoints.add(downtown);
-
-    // await MapBoxNavigation.instance.startNavigation(wayPoints: wayPoints);
+      console.log(markers.toString());
+    }
   }
-
-  // bool _isMultipleStop = false;
-  // double? _distanceRemaining, _durationRemaining;
-
-  // MapBoxNavigationViewController? _controller;
-  // bool routeBuilt = false;
-  // bool _isNavigating = false;
-  // late MapBoxOptions _navigationOption;
-  // String? _platformVersion;
-  // String? _instruction;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   initialize();
-  //   Future.delayed(
-  //     const Duration(seconds: 2),
-  //     () {
-  //       var wayPoints = <WayPoint>[];
-  //       wayPoints.add(WayPoint(
-  //           name: "Source",
-  //           latitude: widget.trip.terminal.from.latitude,
-  //           longitude: widget.trip.terminal.from.longitude,
-  //           isSilent: false));
-
-  //       // adding stop if there is.
-  //       if (widget.trip.route.stops.isNotEmpty) {
-  //         for (var stop in widget.trip.route.stops) {
-  //           wayPoints.add(
-  //             WayPoint(
-  //               name: 'stop ${wayPoints.length + 1}',
-  //               latitude: stop.latitude,
-  //               longitude: stop.longitude,
-  //             ),
-  //           );
-  //         }
-  //       }
-  //       wayPoints.add(WayPoint(
-  //           name: "Your destination",
-  //           latitude: widget.trip.terminal.to.latitude,
-  //           longitude: widget.trip.terminal.to.longitude,
-  //           isSilent: false));
-  //       log(wayPoints.toString());
-
-  //       _isMultipleStop = wayPoints.length > 2;
-  //       _controller?.buildRoute(
-  //         wayPoints: wayPoints,
-  //         options: _navigationOption,
-  //       );
-  //     },
-  //   );
-  // }
-
-  // @override
-  // void dispose() {
-  //   _controller?.dispose();
-  //   super.dispose();
-  // }
-
-  // Future<void> initialize() async {
-  //   // If the widget was removed from the tree while the asynchronous platform
-  //   // message was in flight, we want to discard the reply rather than calling
-  //   // setState to update our non-existent appearance.
-  //   if (!mounted) return;
-
-  //   _navigationOption = MapBoxNavigation.instance.getDefaultOptions();
-  //   _navigationOption.simulateRoute = true;
-  //   _navigationOption.language = "en";
-  //   //_navigationOption.initialLatitude = 36.1175275;
-  //   //_navigationOption.initialLongitude = -115.1839524;
-  //   MapBoxNavigation.instance.registerRouteEventListener(_onEmbeddedRouteEvent);
-
-  //   String? platformVersion;
-  //   // Platform messages may fail, so we use a try/catch PlatformException.
-  //   try {
-  //     platformVersion = await MapBoxNavigation.instance.getPlatformVersion();
-  //   } on PlatformException {
-  //     platformVersion = 'Failed to get platform version.';
-  //   }
-
-  //   setState(() {
-  //     _platformVersion = platformVersion;
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey,
-      body: Container(
-        color: Colors.grey,
-        child:Placeholder()
-        //  MapBoxNavigationView(
-        //     options: _navigationOption,
-        //     onRouteEvent: _onEmbeddedRouteEvent,
-        //     onCreated: (MapBoxNavigationViewController controller) async {
-        //       _controller = controller;
-        //     }),
-      ),
-      //  Center(
-      //   child: Stack(
-      //     children: <Widget>[
-      //       Container(
-      //         color: Colors.grey,
+      body: Stack(children: [
+        GoogleMap(
+          zoomControlsEnabled: false,
+          polylines: Set<Polyline>.of(polylines.values),
+          initialCameraPosition: CameraPosition(
+            target: LatLng(widget.trip.terminal.from.latitude,
+                widget.trip.terminal.from.longitude),
+            zoom: 9.0,
+          ),
+          markers: markers,
+          onMapCreated: (GoogleMapController controller) {
+            _controller.complete(controller);
+          },
+        ),
+        if (widget.trip.status == 'started')
+          Positioned(
+            bottom: 10,
+            right: 10,
+            child: Container(
+              width: 50,
+              height: 50,
+              decoration: const BoxDecoration(
+                  color: Colors.blue,
+                  // borderRadius: BorderRadius.circular(20),
+                  shape: BoxShape.circle),
+              child: Center(
+                child: IconButton(
+                  onPressed: () async {
+                    for (var stop in widget.trip.route.stops) {
+                      waypoints += '${stop.latitude},${stop.longitude}|';
+                      console.log(
+                          'Added waypoint: ${stop.latitude},${stop.longitude}');
+                    }
+                    if (waypoints.isNotEmpty) {
+                      waypoints = waypoints.substring(0, waypoints.length - 1);
+                    } // Remove the trailing '|'
 
-      //         child: MapBoxNavigationView(
-      //             options: _navigationOption,
-      //             onRouteEvent: _onEmbeddedRouteEvent,
-      //             onCreated: (MapBoxNavigationViewController controller) async {
-      //               _controller = controller;
-      //               controller.initialize();
-      //             }),
-      //       ),
-      //       if(routeBuilt)
-      //       Positioned(
-      //         top: MediaQuery.of(context).size.height * widget.dimension2,
-      //         left: MediaQuery.of(context).size.width * widget.dimension,
-      //         child: SizedBox(
-      //           width: 75,
-      //           height: 55,
-      //           child: CustomButton(
-      //             onPressed: routeBuilt && !_isNavigating
-      //                 ? () {
-      //                     _controller?.startNavigation();
-      //                   }
-      //                 : null,
-      //             child: const Icon(Icons.navigation),
-      //           ),
-      //         ),
-      //       )
-      //     ],
-      //   ),
-      // ),
+                    await launchUrl(Uri.parse(
+                      'google.navigation:q=${widget.trip.terminal.to.latitude},${widget.trip.terminal.to.longitude}',
+                    ));
+                    console.log(
+                      'Navigation URL: google.navigation:q=${widget.trip.terminal.from.latitude},${widget.trip.terminal.from.longitude}&waypoints=$waypoints&daddr=${widget.trip.terminal.to.latitude},${widget.trip.terminal.to.longitude}',
+                    );
+                    console.log(
+                        'Navigation URL: google.navigation:q=${widget.trip.terminal.from.latitude},${widget.trip.terminal.from.longitude}&waypoints=$waypoints&daddr=${widget.trip.terminal.to.latitude},${widget.trip.terminal.to.longitude}');
+                  },
+                  icon: const Icon(
+                    Icons.navigation_outlined,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ]),
     );
   }
 
-  // Future<void> _onEmbeddedRouteEvent(e) async {
-  //   _distanceRemaining = await MapBoxNavigation.instance.getDistanceRemaining();
-  //   _durationRemaining = await MapBoxNavigation.instance.getDurationRemaining();
+  getNavigation() async {
+    if (!mounted) return;
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+    final GoogleMapController? controller = await _controller.future;
+    location.changeSettings(accuracy: LocationAccuracy.high);
+    _serviceEnabled = await location.serviceEnabled();
 
-  //   switch (e.eventType) {
-  //     case MapBoxEvent.progress_change:
-  //       var progressEvent = e.data as RouteProgressEvent;
-  //       if (progressEvent.currentStepInstruction != null) {
-  //         _instruction = progressEvent.currentStepInstruction;
-  //       }
-  //       break;
-  //     case MapBoxEvent.route_building:
-  //     case MapBoxEvent.route_built:
-  //       setState(() {
-  //         routeBuilt = true;
-  //       });
-  //       break;
-  //     case MapBoxEvent.route_build_failed:
-  //       setState(() {
-  //         routeBuilt = false;
-  //       });
-  //       break;
-  //     case MapBoxEvent.navigation_running:
-  //       setState(() {
-  //         _isNavigating = true;
-  //       });
-  //       break;
-  //     case MapBoxEvent.on_arrival:
-  //       if (!_isMultipleStop) {
-  //         await Future.delayed(const Duration(seconds: 3));
-  //         await _controller?.finishNavigation();
-  //       } else {}
-  //       break;
-  //     case MapBoxEvent.navigation_finished:
-  //     case MapBoxEvent.navigation_cancelled:
-  //       scaffoldKey.currentState?.setState(() {
-  //         routeBuilt = false;
-  //         _isNavigating = false;
-  //       });
-
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  //   setState(() {});
-  // }
-
-  Future<void> _onEmbeddedRouteEvent(e) async {
-    _distanceRemaining = await MapBoxNavigation.instance.getDistanceRemaining();
-    _durationRemaining = await MapBoxNavigation.instance.getDurationRemaining();
-
-    switch (e.eventType) {
-      case MapBoxEvent.progress_change:
-        var progressEvent = e.data as RouteProgressEvent;
-        if (progressEvent.currentStepInstruction != null) {
-          _instruction = progressEvent.currentStepInstruction;
-        }
-        break;
-      case MapBoxEvent.route_building:
-      case MapBoxEvent.route_built:
-        setState(() {
-          _routeBuilt = true;
-        });
-        break;
-      case MapBoxEvent.route_build_failed:
-        setState(() {
-          _routeBuilt = false;
-        });
-        break;
-      case MapBoxEvent.navigation_running:
-        setState(() {
-          _isNavigating = true;
-        });
-        break;
-      case MapBoxEvent.on_arrival:
-        if (!_isMultipleStop) {
-          await Future.delayed(const Duration(seconds: 3));
-          await _controller?.finishNavigation();
-        } else {}
-        break;
-      case MapBoxEvent.navigation_finished:
-      case MapBoxEvent.navigation_cancelled:
-        setState(() {
-          _routeBuilt = false;
-          _isNavigating = false;
-        });
-        break;
-      default:
-        break;
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
     }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+    if (_permissionGranted == PermissionStatus.granted) {
+      if (!mounted) return;
+      _currentPosition = await location.getLocation();
+      curLocation =
+          LatLng(_currentPosition!.latitude!, _currentPosition!.longitude!);
+      getDirections();
+
+      if (widget.trip.status == 'started') {
+        locationSubscription =
+            location.onLocationChanged.listen((LocationData currentLocation) {
+          if (!mounted) return;
+          controller?.animateCamera(CameraUpdate.newCameraPosition(
+              CameraPosition(
+                  target: LatLng(curLocation.latitude, curLocation.longitude),
+                  zoom: 8.0)));
+          {
+            showMarkerInfo() async {
+              final GoogleMapController? controller = await _controller.future;
+              if (sourcePosition != null) {
+                controller?.showMarkerInfoWindow(
+                    MarkerId(sourcePosition!.markerId.value));
+              }
+            }
+
+            setState(() {
+              curLocation =
+                  LatLng(currentLocation.latitude!, currentLocation.longitude!);
+              sourcePosition = Marker(
+                markerId: MarkerId(
+                    'sourcepos_${DateTime.now().millisecondsSinceEpoch}'),
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueBlue),
+                position: LatLng(
+                    currentLocation.latitude!, currentLocation.longitude!),
+                infoWindow: InfoWindow(
+                    title: double.parse((getDistance().toStringAsFixed(2)))
+                        .toString()),
+              );
+              //add source marker to the markers
+              markers.add(sourcePosition!);
+            });
+            getDirections();
+          }
+        });
+      }
+    }
+  }
+
+  Future<void> getDirections() async {
+    List<LatLng> polylinecoordinates = [];
+    List<dynamic> points = [];
+
+    const maxRetries = 3;
+    int retryCount = 0;
+
+    while (retryCount < maxRetries) {
+      try {
+        PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+          apiKey,
+          PointLatLng(widget.trip.terminal.from.latitude,
+              widget.trip.terminal.from.longitude),
+          PointLatLng(widget.trip.terminal.to.latitude,
+              widget.trip.terminal.to.longitude),
+          travelMode: TravelMode.driving,
+        );
+
+        if (result.points.isNotEmpty) {
+          for (var point in result.points) {
+            polylinecoordinates.add(LatLng(point.latitude, point.longitude));
+            points.add({"lat": point.latitude, "lng": point.longitude});
+          }
+
+          addPolyline(polylinecoordinates);
+        } else {
+          print("No valid route found");
+          // Handle the case when no valid route is found
+        }
+        return;
+      } catch (e) {
+        // Log the error and retry after a delay
+        print('Error: $e');
+        await Future.delayed(Duration(seconds: retryCount * 2));
+        retryCount++;
+      }
+    }
+
+    // Handle the case when all retries fail
+    print('Failed to get directions after $maxRetries attempts.');
+  }
+
+  addPolyline(List<LatLng> polylinecoordinates) {
+    PolylineId id = const PolylineId("poly");
+    Polyline polyline = Polyline(
+        polylineId: id, color: orange, points: polylinecoordinates, width: 3);
+    polylines[id] = polyline;
     setState(() {});
+  }
+
+  double calculateDistance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
+  }
+
+  double getDistance() {
+    return calculateDistance(
+        widget.trip.terminal.from.latitude,
+        widget.trip.terminal.from.longitude,
+        widget.trip.terminal.to.latitude,
+        widget.trip.terminal.to.longitude);
   }
 }
