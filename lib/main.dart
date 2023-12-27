@@ -1,6 +1,7 @@
 import 'package:bookihub/src/features/authentication/presentation/auth_state.dart';
 import 'package:bookihub/src/features/authentication/presentation/dependency/auth_dependencies.dart';
 import 'package:bookihub/src/features/authentication/presentation/provider/auth_provider.dart';
+import 'package:bookihub/src/features/map/presentation/views/map_view.dart';
 import 'package:bookihub/src/features/reports/presentation/dependency/report_dependencies.dart';
 import 'package:bookihub/src/features/trip/presentation/dependency/trip_dependency.dart';
 import 'package:bookihub/src/shared/utils/interceptor.dart';
@@ -45,11 +46,11 @@ class MainApp extends StatelessWidget {
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: LightTheme.themeData(),
-          home: const AuthState()),
+          home:  RouteMap()),
     );
   }
 }
 
 
 // sk.eyJ1IjoiMDU0NDUxMTU4MSIsImEiOiJjbG9iczNqeXAweWh2MndxcWhsdWN4bjhqIn0.6iHDsqPV-J2QwxR-Uw9-Zg
- 
+// pk.eyJ1IjoiMDU0NDUxMTU4MSIsImEiOiJjbHBscDBtMjMwMmcxMmpwNjhwdTV3YmhmIn0.9OfNs-D3HGPVbY-zsCkowA
