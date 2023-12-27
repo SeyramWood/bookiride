@@ -182,49 +182,77 @@ class InspectionStatus {
       };
 }
 
+
 class Route {
-  int id;
-  String from;
-  String to;
-  double fromLatitude;
-  double fromLongitude;
-  double toLatitude;
-  double toLongitude;
-  List<Stop> stops;
+    int id;
+    String from;
+    String to;
+    List<Stop> stops;
 
-  Route({
-    required this.id,
-    required this.from,
-    required this.to,
-    required this.fromLatitude,
-    required this.fromLongitude,
-    required this.toLatitude,
-    required this.toLongitude,
+    Route({
+        required this.id,
+        required this.from,
+        required this.to,
     required this.stops,
-  });
+    });
 
-  factory Route.fromJson(Map<String, dynamic> json) => Route(
+    factory Route.fromJson(Map<String, dynamic> json) => Route(
         id: json["id"],
-        from: json["from"] ?? '',
-        to: json["to"] ?? '',
-        fromLatitude: json["fromLatitude"]?.toDouble(),
-        fromLongitude: json["fromLongitude"]?.toDouble(),
-        toLatitude: json["toLatitude"]?.toDouble(),
-        toLongitude: json["toLongitude"]?.toDouble(),
-        stops: List<Stop>.from(json["stops"].map((x) => Stop.fromJson(x))),
-      );
+        from: json["from"],
+        to: json["to"],
+        stops: List<Stop>.from(json["stops"]?.map((x) => Stop.fromJson(x))??[]),
 
-  Map<String, dynamic> toJson() => {
+    );
+
+    Map<String, dynamic> toJson() => {
         "id": id,
         "from": from,
         "to": to,
-        "fromLatitude": fromLatitude,
-        "fromLongitude": fromLongitude,
-        "toLatitude": toLatitude,
-        "toLongitude": toLongitude,
-        "stops": List<dynamic>.from(stops.map((x) => x.toJson())),
-      };
+    };
 }
+// class Route {
+//   int id;
+//   String from;
+//   String to;
+//   double fromLatitude;
+//   double fromLongitude;
+//   double toLatitude;
+//   double toLongitude;
+//   List<Stop> stops;
+
+//   Route({
+//     required this.id,
+//     required this.from,
+//     required this.to,
+//     required this.fromLatitude,
+//     required this.fromLongitude,
+//     required this.toLatitude,
+//     required this.toLongitude,
+    // required this.stops,
+//   });
+
+//   factory Route.fromJson(Map<String, dynamic> json) => Route(
+//         id: json["id"],
+//         from: json["from"] ?? '',
+//         to: json["to"] ?? '',
+//         fromLatitude: json["fromLatitude"]?.toDouble(),
+//         fromLongitude: json["fromLongitude"]?.toDouble(),
+//         toLatitude: json["toLatitude"]?.toDouble(),
+//         toLongitude: json["toLongitude"]?.toDouble(),
+        // stops: List<Stop>.from(json["stops"].map((x) => Stop.fromJson(x))),
+//       );
+
+//   Map<String, dynamic> toJson() => {
+//         "id": id,
+//         "from": from,
+//         "to": to,
+//         "fromLatitude": fromLatitude,
+//         "fromLongitude": fromLongitude,
+//         "toLatitude": toLatitude,
+//         "toLongitude": toLongitude,
+//         "stops": List<dynamic>.from(stops.map((x) => x.toJson())),
+//       };
+// }
 
 class Stop {
   int id;

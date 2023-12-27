@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:bookihub/src/shared/utils/button_extension.dart';
+import 'package:bookihub/src/shared/utils/date_time.formatting.dart';
 import 'package:bookihub/src/shared/utils/show.snacbar.dart';
 import 'package:provider/provider.dart';
 
@@ -30,8 +31,14 @@ class _TripStartedViewState extends State<TripStartedView> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    context.read<TripProvider>().retrieveStoredData();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    var time = context.read<TripProvider>().tripStartedTime ?? DateTime.now();
+    var tiMe = context.read<TripProvider>().tripStartedTime ?? DateTime.now();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -82,8 +89,8 @@ class _TripStartedViewState extends State<TripStartedView> {
                 children: [
                   Center(child: injectedMap()),
                   Positioned(
-                      top: MediaQuery.sizeOf(context).height * .5,
-                      left: MediaQuery.sizeOf(context).width * .7,
+                      top: MediaQuery.sizeOf(context).height * .55,
+                      left: MediaQuery.sizeOf(context).width * .73,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
@@ -127,9 +134,9 @@ class _TripStartedViewState extends State<TripStartedView> {
                             borderRadius: BorderRadius.circular(5)),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 10),
+                              horizontal: 60, vertical: 10),
                           child: Text(
-                            '${time.hour} hour: ${time.minute} mins: ${time.second} secs',
+                            '@ ${time.format(tiMe)}',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
@@ -161,8 +168,8 @@ class _TripStartedViewState extends State<TripStartedView> {
                                   showCustomSnackBar(
                                       context, l.message, orange);
                                 }, (r) {
-                                  context.read<TripProvider>().startedDate =
-                                      DateTime.now();
+                                  // context.read<TripProvider>().startedDate =
+                                  //     DateTime.now();
                                   showCustomSnackBar(
                                     context,
                                     'Trip successfully ended',

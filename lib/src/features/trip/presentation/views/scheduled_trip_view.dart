@@ -6,6 +6,7 @@ import 'package:bookihub/src/features/trip/presentation/provider/trip_provider.d
 import 'package:bookihub/src/shared/constant/dimensions.dart';
 import 'package:bookihub/src/shared/utils/date_time.formatting.dart';
 import 'package:bookihub/src/shared/utils/show.snacbar.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../shared/utils/exports.dart';
@@ -48,6 +49,7 @@ class _ScheduledTripViewState extends State<ScheduledTripView> {
 
   @override
   void initState() {
+    requestPermission();
     fetchTrips();
 
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
@@ -62,7 +64,9 @@ class _ScheduledTripViewState extends State<ScheduledTripView> {
     _streamController.close(); // Close the stream controller
     super.dispose();
   }
-
+void requestPermission()async{
+     await Permission.location.request();
+}
   final List<Map<String, String>> dates = [];
 
   @override
@@ -113,9 +117,9 @@ class _ScheduledTripViewState extends State<ScheduledTripView> {
                           );
                         },
                         location: trip.route.from,
-                        lDescription: trip.terminal.from.name  ,
+                        lDescription: trip.terminal.from.address  ,
                         destination: trip.route.to,
-                        dDescription: trip.terminal.to.name ,
+                        dDescription: trip.terminal.to.address ,
                         startTime: time.format(trip.departureDate),
                         endTime: time.format(trip.arrivalDate),
                       ),

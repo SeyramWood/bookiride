@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:record_mp3/record_mp3.dart';
 import '../../../../../main.dart';
+import '../../../../shared/utils/date_time.formatting.dart';
 import '../../../../shared/utils/file_picker.dart';
 import '../../../../shared/utils/permissions/permissions.dart';
 import '../../../../shared/utils/show.snacbar.dart';
@@ -32,6 +33,7 @@ class _FleetMgtReportState extends State<FleetMgtReport> {
   String statusText = "Record pickup location";
   bool isRecording = false;
   File? recordFile;
+  String incidentTime = '';
 
   Future<void> _selectTime() async {
     final TimeOfDay? pickedTime = await showTimePicker(
@@ -50,6 +52,7 @@ class _FleetMgtReportState extends State<FleetMgtReport> {
 
       timeController.text =
           '${selectedTime.toIso8601String().split('.').first}Z';
+      setState(() {});
     }
   }
 
@@ -131,23 +134,24 @@ class _FleetMgtReportState extends State<FleetMgtReport> {
                         .copyWith(fontWeight: FontWeight.w600),
                   ),
                   SizedBox(height: MediaQuery.sizeOf(context).height * .01),
-                  TextFormField(
-                    controller: timeController,
-                    cursorColor: grey,
-                    readOnly: true,
-                    onTap: _selectTime,
-                    decoration: InputDecoration(
-                        isDense: true,
-                        hintText: "When it occurred",
-                        hintStyle: Theme.of(context).textTheme.bodyMedium,
-                        filled: true,
-                        fillColor: white,
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.circular(5)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: grey),
-                            borderRadius: BorderRadius.circular(5))),
+                  GestureDetector(
+                    onTap: () {
+                      _selectTime();
+                    },
+                    child: Material(
+                      // borderRadius: borderRadius,
+                      child: SizedBox(
+                        width: MediaQuery.sizeOf(context).width,
+                        height: 50,
+                        child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 15),
+                            child: Text(timeController.text.isEmpty
+                                ? "When it occurred"
+                                : time.format(
+                                    DateTime.tryParse(timeController.text)!))),
+                      ),
+                    ),
                   ),
                   SizedBox(
                     height: MediaQuery.sizeOf(context).height * .02,
@@ -170,9 +174,8 @@ class _FleetMgtReportState extends State<FleetMgtReport> {
                     ),
                     child: DropdownButton<String>(
                       underline: const SizedBox(), // Removes the underline
-                      isExpanded: true,  
-                      value:
-                          value,  
+                      isExpanded: true,
+                      value: value,
                       onChanged: (String? newValue) {
                         setState(() {
                           value = newValue!;
@@ -280,7 +283,7 @@ class _FleetMgtReportState extends State<FleetMgtReport> {
                         child: images.isNotEmpty
                             ? Center(
                                 child: Text(
-                                  "${images.length} images are ready to be sent",
+                                  "${images.length} image(s) are selected to be sent",
                                 ),
                               )
                             : Row(
@@ -329,8 +332,10 @@ class _FleetMgtReportState extends State<FleetMgtReport> {
                             value.fold(
                                 (failure) => showCustomSnackBar(
                                     context, failure.message, orange),
-                                (success) => showCustomSnackBar(
-                                    context, success, green));
+                                (success) {
+                              Navigator.of(context).pop();
+                              showCustomSnackBar(context, success, green);
+                            });
                           },
                         );
                       },

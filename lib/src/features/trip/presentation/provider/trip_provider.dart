@@ -7,6 +7,7 @@ import 'package:bookihub/src/shared/utils/usecase.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:bookihub/src/shared/constant/model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../domain/usecase/update_trip_status.dart';
 
@@ -28,11 +29,28 @@ class TripProvider extends ChangeNotifier {
   bool _updating = false;
   bool get isUpdating => _updating;
 
-  DateTime? tripStartedTime;
+  DateTime? _tripStartedTime;
+  DateTime? get tripStartedTime => _tripStartedTime;
 
-  set startedDate(DateTime time) {
-    tripStartedTime = time;
+  Future<void> startedDate(DateTime time) async {
+    _tripStartedTime = time;
+
+    // Store the _tripStartedTime in shared preferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('tripStartedTime', _tripStartedTime?.toIso8601String() ?? '');
+
+    notifyListeners();
   }
+  Future<void> retrieveStoredData() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String storedTime = prefs.getString('tripStartedTime') ?? '';
+
+  if (storedTime.isNotEmpty) {
+    _tripStartedTime = DateTime.parse(storedTime);
+    notifyListeners();
+  }
+}
+
 
   //fetch trips by driver
   Future<Either<Failure, List<Trip>>> fetchTrips(

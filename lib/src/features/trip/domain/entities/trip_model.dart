@@ -141,41 +141,90 @@ class Trip {
 }
 
 class Terminal {
-  From from;
-  From to;
+    From from;
+    From to;
 
-  Terminal({
-    required this.from,
-    required this.to,
-  });
+    Terminal({
+        required this.from,
+        required this.to,
+    });
 
-  factory Terminal.fromJson(Map<String, dynamic> json) => Terminal(
+    factory Terminal.fromJson(Map<String, dynamic> json) => Terminal(
         from: From.fromJson(json["from"]),
         to: From.fromJson(json["to"]),
-      );
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "from": from.toJson(),
         "to": to.toJson(),
-      };
+    };
 }
 
 class From {
-  int id;
-  String name;
+    int id;
+    String address;
+    double latitude;
+    double longitude;
 
-  From({
-    required this.id,
-    required this.name,
-  });
+    From({
+        required this.id,
+        required this.address,
+        required this.latitude,
+        required this.longitude,
+    });
 
-  factory From.fromJson(Map<String, dynamic> json) => From(
+    factory From.fromJson(Map<String, dynamic> json) => From(
         id: json["id"],
-        name: json["name"],
-      );
+        address: json["address"],
+        latitude: json["latitude"]?.toDouble(),
+        longitude: json["longitude"]?.toDouble(),
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "id": id,
-        "name": name,
-      };
+        "address": address,
+        "latitude": latitude,
+        "longitude": longitude,
+    };
 }
+
+
+// class Terminal {
+//   From from;
+//   From to;
+
+//   Terminal({
+//     required this.from,
+//     required this.to,
+//   });
+
+//   factory Terminal.fromJson(Map<String, dynamic> json) => Terminal(
+//         from: From.fromJson(json["from"]),
+//         to: From.fromJson(json["to"]),
+//       );
+
+//   Map<String, dynamic> toJson() => {
+//         "from": from.toJson(),
+//         "to": to.toJson(),
+//       };
+// }
+
+// class From {
+//   int id;
+//   String name;
+
+//   From({
+//     required this.id,
+//     required this.name,
+//   });
+
+//   factory From.fromJson(Map<String, dynamic> json) => From(
+//         id: json["id"],
+//         name: json["name"],
+//       );
+
+//   Map<String, dynamic> toJson() => {
+//         "id": id,
+//         "name": name,
+//       };
+// }

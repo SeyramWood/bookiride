@@ -11,6 +11,7 @@ import 'src/features/delivery/presentation/dependency/delivery_dependencies.dart
 import 'src/shared/utils/exports.dart';
 
 GetIt locator = GetIt.instance;
+const String apiKey = "AIzaSyA_qBSnevO4T8L2pW2qaCl13WOVPX9Gb9U";
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,11 +46,11 @@ class MainApp extends StatelessWidget {
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: LightTheme.themeData(),
-          home: const AuthState()),
+          home:  const AuthState()),
     );
   }
 }
 
 
 // sk.eyJ1IjoiMDU0NDUxMTU4MSIsImEiOiJjbG9iczNqeXAweWh2MndxcWhsdWN4bjhqIn0.6iHDsqPV-J2QwxR-Uw9-Zg
- 
+// pk.eyJ1IjoiMDU0NDUxMTU4MSIsImEiOiJjbHBscDBtMjMwMmcxMmpwNjhwdTV3YmhmIn0.9OfNs-D3HGPVbY-zsCkowA
