@@ -11,7 +11,7 @@ import 'src/features/delivery/presentation/dependency/delivery_dependencies.dart
 import 'src/shared/utils/exports.dart';
 
 GetIt locator = GetIt.instance;
-final String apiKey = "AIzaSyA_qBSnevO4T8L2pW2qaCl13WOVPX9Gb9U";
+const String apiKey = "AIzaSyA_qBSnevO4T8L2pW2qaCl13WOVPX9Gb9U";
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

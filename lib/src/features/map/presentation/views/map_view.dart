@@ -158,14 +158,13 @@ class _RouteMapState extends State<RouteMap> {
     );
   }
 
-  getNavigation() async {
+  Future<void> getNavigation() async {
     if (!mounted) return;
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
+
     final GoogleMapController? controller = await _controller.future;
     location.changeSettings(accuracy: LocationAccuracy.high);
-    _serviceEnabled = await location.serviceEnabled();
 
+    bool _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
       if (!_serviceEnabled) {
@@ -173,29 +172,34 @@ class _RouteMapState extends State<RouteMap> {
       }
     }
 
-    _permissionGranted = await location.hasPermission();
+    PermissionStatus _permissionGranted = await location.hasPermission();
     if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
     }
+
     if (_permissionGranted == PermissionStatus.granted) {
       if (!mounted) return;
+
       _currentPosition = await location.getLocation();
       curLocation =
           LatLng(_currentPosition!.latitude!, _currentPosition!.longitude!);
+
       getDirections();
 
       if (widget.trip.status == 'started') {
-        locationSubscription =
-            location.onLocationChanged.listen((LocationData currentLocation) {
-          if (!mounted) return;
-          controller?.animateCamera(CameraUpdate.newCameraPosition(
-              CameraPosition(
+        locationSubscription = location.onLocationChanged.listen(
+          (LocationData currentLocation) {
+            if (!mounted) return;
+
+            controller?.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(
                   target: LatLng(curLocation.latitude, curLocation.longitude),
-                  zoom: 8.0)));
-          {
+                  zoom: 8.0,
+                ),
+              ),
+            );
+
             showMarkerInfo() async {
               final GoogleMapController? controller = await _controller.future;
               if (sourcePosition != null) {
@@ -215,15 +219,16 @@ class _RouteMapState extends State<RouteMap> {
                 position: LatLng(
                     currentLocation.latitude!, currentLocation.longitude!),
                 infoWindow: InfoWindow(
-                    title: double.parse((getDistance().toStringAsFixed(2)))
-                        .toString()),
+                  title: double.parse((getDistance().toStringAsFixed(2)))
+                      .toString(),
+                ),
               );
-              //add source marker to the markers
               markers.add(sourcePosition!);
             });
+
             getDirections();
-          }
-        });
+          },
+        );
       }
     }
   }
