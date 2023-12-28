@@ -265,14 +265,14 @@ class _RouteMapState extends State<RouteMap> {
         return;
       } catch (e) {
         // Log the error and retry after a delay
-        print('Error: $e');
+        console.log('Error: $e');
         await Future.delayed(Duration(seconds: retryCount * 2));
         retryCount++;
       }
     }
 
     // Handle the case when all retries fail
-    print('Failed to get directions after $maxRetries attempts.');
+    console.log('Failed to get directions after $maxRetries attempts.');
   }
 
   addPolyline(List<LatLng> polylinecoordinates) {
