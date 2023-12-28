@@ -27,7 +27,7 @@ if (flutterVersionName == null) {
 // apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 def keystoreProperties = new Properties()
-   def keystorePropertiesFile = rootProject.file('app/config/key.properties')
+   def keystorePropertiesFile = rootProject.file('key.properties')
    if (keystorePropertiesFile.exists()) {
        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
@@ -60,6 +60,27 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
+
+     signingConfigs {
+       release {
+            //  From decoded key
+            storeFile = file('upload-keystore.jks')
+
+            // From key.properties
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storePassword keystoreProperties['storePassword']
+            // storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+       }
+    }
+    buildTypes {
+       release {
+            minifyEnabled true
+            signingConfig signingConfigs.release
+       }
+    }
+    
+
     
     // signingConfigs {
     //     release {
@@ -72,13 +93,13 @@ android {
     //     }
     // }
 
-    buildTypes {
-        release {
+    // buildTypes {
+    //     release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             // signingConfig signingConfigs.debug
-        }
-    }
+    //     }
+    // }
 
 
 }
