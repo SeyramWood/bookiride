@@ -73,10 +73,10 @@ android {
             // storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
        }
     }
-    buildTypes {
+   buildTypes {
        release {
             minifyEnabled true
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
        }
     }
     
