@@ -61,6 +61,8 @@ class _ScheduledTripViewState extends State<ScheduledTripView> {
   @override
   void dispose() {
     _timer.cancel();
+
+    
     _streamController.close(); // Close the stream controller
     super.dispose();
   }
