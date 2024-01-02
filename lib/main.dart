@@ -5,6 +5,7 @@ import 'package:bookihub/src/features/reports/presentation/dependency/report_dep
 import 'package:bookihub/src/features/trip/presentation/dependency/trip_dependency.dart';
 import 'package:bookihub/src/shared/utils/interceptor.dart';
 import 'package:get_it/get_it.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'src/features/delivery/presentation/dependency/delivery_dependencies.dart';

@@ -1,4 +1,4 @@
-package com.bookihub.b_ride
+package com.bookiride.driver
 
 import io.flutter.embedding.android.FlutterActivity
 
