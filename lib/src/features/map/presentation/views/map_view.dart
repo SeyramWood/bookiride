@@ -6,8 +6,8 @@ import 'dart:math';
 import 'package:bookihub/main.dart';
 import 'package:bookihub/src/shared/utils/exports.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../trip/domain/entities/trip_model.dart';
 
@@ -32,11 +32,11 @@ class _RouteMapState extends State<RouteMap> {
   final Completer<GoogleMapController?> _controller = Completer();
   Map<PolylineId, Polyline> polylines = {};
   PolylinePoints polylinePoints = PolylinePoints();
-  Location location = Location();
+  Geolocator location = Geolocator();
   Marker? sourcePosition, destinationPosition;
-  LocationData? _currentPosition;
+  Position? _currentPosition;
   LatLng curLocation = const LatLng(0.0, 0.0);
-  StreamSubscription<LocationData>? locationSubscription;
+  StreamSubscription<Position>? locationSubscription;
   Set<Marker> markers = {};
   String waypoints = '';
 
@@ -63,6 +63,7 @@ class _RouteMapState extends State<RouteMap> {
               BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
           position: curLocation,
         ));
+        // console.log(curLocation.toString());
         markers.add(Marker(
           markerId: MarkerId('source_${DateTime.now().millisecondsSinceEpoch}'),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
@@ -93,7 +94,7 @@ class _RouteMapState extends State<RouteMap> {
         ));
       });
 
-      console.log(markers.toString());
+      // console.log(markers.toString());
     }
   }
 
@@ -161,72 +162,78 @@ class _RouteMapState extends State<RouteMap> {
   Future<void> getNavigation() async {
     if (!mounted) return;
 
+    bool serviceEnabled;
+    LocationPermission permissionGranted;
     final GoogleMapController? controller = await _controller.future;
-    location.changeSettings(accuracy: LocationAccuracy.high);
 
-    bool _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      if (!serviceEnabled) {
         return;
       }
     }
 
-    PermissionStatus _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
+    permissionGranted = await Geolocator.checkPermission();
+    if (permissionGranted == LocationPermission.denied) {
+      permissionGranted = await Geolocator.requestPermission();
     }
 
-    if (_permissionGranted == PermissionStatus.granted) {
+    if (permissionGranted != LocationPermission.denied) {
       if (!mounted) return;
 
-      _currentPosition = await location.getLocation();
+      _currentPosition = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
       curLocation =
-          LatLng(_currentPosition!.latitude!, _currentPosition!.longitude!);
+          LatLng(_currentPosition!.latitude, _currentPosition!.longitude);
 
       getDirections();
 
       if (widget.trip.status == 'started') {
-        locationSubscription = location.onLocationChanged.listen(
-          (LocationData currentLocation) {
+        locationSubscription = Geolocator.getPositionStream().listen(
+          (Position? currentLocation) {
             if (!mounted) return;
 
-            controller?.animateCamera(
-              CameraUpdate.newCameraPosition(
-                CameraPosition(
-                  target: LatLng(curLocation.latitude, curLocation.longitude),
-                  zoom: 8.0,
-                ),
-              ),
-            );
-
-            showMarkerInfo() async {
-              final GoogleMapController? controller = await _controller.future;
-              if (sourcePosition != null) {
-                controller?.showMarkerInfoWindow(
-                    MarkerId(sourcePosition!.markerId.value));
-              }
-            }
-
-            setState(() {
-              curLocation =
-                  LatLng(currentLocation.latitude!, currentLocation.longitude!);
-              sourcePosition = Marker(
-                markerId: MarkerId(
-                    'sourcepos_${DateTime.now().millisecondsSinceEpoch}'),
-                icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueBlue),
-                position: LatLng(
-                    currentLocation.latitude!, currentLocation.longitude!),
-                infoWindow: InfoWindow(
-                  title: double.parse((getDistance().toStringAsFixed(2)))
-                      .toString(),
+            if (currentLocation != null) {
+              controller?.animateCamera(
+                CameraUpdate.newCameraPosition(
+                  CameraPosition(
+                    target: LatLng(curLocation.latitude, curLocation.longitude),
+                    zoom: 8.0,
+                  ),
                 ),
               );
-              markers.add(sourcePosition!);
-            });
 
-            getDirections();
+              showMarkerInfo() async {
+                final GoogleMapController? controller =
+                    await _controller.future;
+                if (sourcePosition != null) {
+                  controller?.showMarkerInfoWindow(
+                      MarkerId(sourcePosition!.markerId.value));
+                }
+              }
+
+              setState(() {
+                curLocation =
+                    LatLng(currentLocation.latitude, currentLocation.longitude);
+                sourcePosition = Marker(
+                  markerId: MarkerId(
+                      'sourcepos_${DateTime.now().millisecondsSinceEpoch}'),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueBlue),
+                  position: LatLng(
+                      currentLocation.latitude, currentLocation.longitude),
+                  infoWindow: InfoWindow(
+                    title: double.parse((getDistance().toStringAsFixed(2)))
+                        .toString(),
+                  ),
+                );
+                markers.add(sourcePosition!);
+              });
+
+              getDirections();
+            }
           },
         );
       }

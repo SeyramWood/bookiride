@@ -16,6 +16,7 @@ class _LoginViewState extends State<LoginView> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+  bool obscurePassword = true;
 
   String? validateEmail(String value) {
     // Email validation regex
@@ -60,22 +61,21 @@ class _LoginViewState extends State<LoginView> {
                 key: formKey,
                 child: Column(
                   children: [
-                     TextFormField(
-                       controller: emailController,
-                       validator: (value) => validateEmail(value!),
-                       decoration: InputDecoration(
-                         fillColor: white,
-                         filled: true,
-                         hintText: "example@email.com",
-                         errorStyle: const TextStyle(fontSize: 15),
-
-                         isDense: true,
-                         border: OutlineInputBorder(
-                           borderRadius: BorderRadius.circular(5),
-                           borderSide: BorderSide.none,
-                         ),
-                       ),
-                     ),
+                    TextFormField(
+                      controller: emailController,
+                      validator: (value) => validateEmail(value!),
+                      decoration: InputDecoration(
+                        fillColor: white,
+                        filled: true,
+                        hintText: "example@email.com",
+                        errorStyle: const TextStyle(fontSize: 15),
+                        isDense: true,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.02,
                     ),
@@ -87,17 +87,29 @@ class _LoginViewState extends State<LoginView> {
                         }
                         return null;
                       },
-                      obscureText: true,
+                      obscureText: obscurePassword,
                       decoration: InputDecoration(
                         fillColor: white,
                         filled: true,
                         errorStyle: const TextStyle(fontSize: 15),
                         hintText: "Password",
-
                         isDense: true,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5),
                           borderSide: BorderSide.none,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              obscurePassword = !obscurePassword;
+                            });
+                          },
                         ),
                       ),
                     ),
