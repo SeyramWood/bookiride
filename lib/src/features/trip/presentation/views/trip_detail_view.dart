@@ -1,4 +1,5 @@
 import 'package:bookihub/src/features/trip/presentation/provider/trip_provider.dart';
+import 'package:bookihub/src/features/trip/presentation/views/ticket_validation_view.dart';
 import 'package:bookihub/src/features/trip/presentation/views/trip_started.dart';
 import 'package:bookihub/src/shared/constant/dimensions.dart';
 import 'package:bookihub/src/shared/utils/alert_dialog.dart';
@@ -71,8 +72,7 @@ class _TripDetailsState extends State<TripDetails> {
         return Padding(
           padding: const EdgeInsets.symmetric(
               horizontal: hPadding, vertical: vPadding),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          child: ListView(children: [
             SizedBox(
               height: MediaQuery.sizeOf(context).height * .1,
               child: Row(
@@ -146,25 +146,67 @@ class _TripDetailsState extends State<TripDetails> {
             Divider(color: orange.withOpacity(.4)),
             vSpace,
             SizedBox(
-              height: MediaQuery.sizeOf(context).height * .1,
-              child: Material(
-                borderRadius: borderRadius,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularPercentageIndicator(percentage: checkPercentage),
-                    const SizedBox(
-                      width: 20,
+              height: MediaQuery.sizeOf(context).height * .12,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Material(
+                    borderRadius: borderRadius,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularPercentageIndicator(
+                              percentage: checkPercentage),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Text(
+                            'Pre-Trip Inspection',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(fontWeight: FontWeight.w600),
+                          )
+                        ],
+                      ),
                     ),
-                    Text(
-                      'Pre-Trip Inspection',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .copyWith(fontWeight: FontWeight.w600),
-                    )
-                  ],
-                ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const ValidateTicketView(),
+                      ));
+                    },
+                    child: Material(
+                      color: blue,
+                      borderRadius: borderRadius,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/icons/ticket.png",
+                              height: 40,
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Text(
+                              'Ticket validation',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(color: white),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             vSpace,

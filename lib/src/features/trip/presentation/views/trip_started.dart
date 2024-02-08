@@ -16,9 +16,9 @@ import '../../../reports/presentation/views/fleet_mgt.dart';
 
 class TripStartedView extends StatefulWidget {
   const TripStartedView({
-    Key? key,
+    super.key,
     required this.trip,
-  }) : super(key: key);
+  });
   final Trip trip;
 
   @override

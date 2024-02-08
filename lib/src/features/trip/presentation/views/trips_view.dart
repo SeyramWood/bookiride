@@ -36,7 +36,7 @@ class _TripsViewState extends State<TripsView> {
                   IconButton(
                       onPressed: () {
                         showCustomDialog(context,
-                            const Text('By continuing will logout you out'),
+                            const Text('By continuing will log you out'),
                             () async {
                           storage.deleteAll();
                           var pref = await SharedPreferences.getInstance();
