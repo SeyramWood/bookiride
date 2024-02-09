@@ -1,5 +1,4 @@
 import 'package:bookihub/src/shared/utils/exports.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 
 class CustomDottedLine extends StatelessWidget {

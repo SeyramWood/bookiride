@@ -1,7 +1,6 @@
 import 'package:bookihub/src/features/trip/presentation/provider/toggle_validation.dart';
 import 'package:bookihub/src/shared/utils/exports.dart';
 import 'package:flutter_dash/flutter_dash.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../../widgets/text_in_column.dart';
 import 'ticket_detail_view.dart';
@@ -74,7 +73,7 @@ class _ValidateTicketViewState extends State<ValidateTicketView> {
                       setState(() {});
                       // Then show a snackbar.
                       ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text(' dismissed')));
+                          .showSnackBar(const SnackBar(content: Text(' dismissed')));
                     },
                     background: Container(
                         color: green,

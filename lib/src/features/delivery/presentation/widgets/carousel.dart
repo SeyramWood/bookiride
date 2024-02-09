@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 
 class ImageCarousel extends StatefulWidget {
   const ImageCarousel({
-    Key? key,
+    super.key,
     required this.images,
-  }) : super(key: key);
+  });
   final List<dynamic> images;
   @override
   State<ImageCarousel> createState() => _ImageCarouselState();

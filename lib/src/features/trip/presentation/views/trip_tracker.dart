@@ -7,9 +7,9 @@ import '../../domain/entities/trip_model.dart';
 
 class TripTrackingView extends StatefulWidget {
   const TripTrackingView({
-    Key? key,
+    super.key,
     required this.trip,
-  }) : super(key: key);
+  });
   final Trip trip;
 
   @override
