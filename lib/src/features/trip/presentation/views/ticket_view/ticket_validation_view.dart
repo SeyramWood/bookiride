@@ -1,9 +1,10 @@
 import 'package:bookihub/src/features/trip/presentation/provider/toggle_validation.dart';
-import 'package:bookihub/src/features/trip/presentation/views/ticket_detail_view.dart';
 import 'package:bookihub/src/shared/utils/exports.dart';
 import 'package:flutter_dash/flutter_dash.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
-import '../widgets/text_in_column.dart';
+import '../../widgets/text_in_column.dart';
+import 'ticket_detail_view.dart';
 
 class ValidateTicketView extends StatefulWidget {
   const ValidateTicketView({super.key});
@@ -13,7 +14,7 @@ class ValidateTicketView extends StatefulWidget {
 }
 
 class _ValidateTicketViewState extends State<ValidateTicketView> {
-  final Clicked clicked = Clicked();
+  final Clicked buttonState = Clicked();
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class _ValidateTicketViewState extends State<ValidateTicketView> {
         centerTitle: true,
       ),
       body: ValueListenableBuilder<bool>(
-        valueListenable: clicked,
+        valueListenable: buttonState,
         builder: (context, stateOfContainer, child) => Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -37,7 +38,7 @@ class _ValidateTicketViewState extends State<ValidateTicketView> {
                     children: [
                       Expanded(
                         child: GestureDetector(
-                          onTap: () => clicked.isClicked(true),
+                          onTap: () => buttonState.isClicked(true),
                           child: _buildButton(
                             text: 'Unchecked',
                             backgroundColor: stateOfContainer ? blue : white,
@@ -49,9 +50,9 @@ class _ValidateTicketViewState extends State<ValidateTicketView> {
                       const SizedBox(width: 1),
                       Expanded(
                         child: GestureDetector(
-                          onTap: () => clicked.isClicked(false),
+                          onTap: () => buttonState.isClicked(false),
                           child: _buildButton(
-                            text: 'Verified',
+                            text: 'Checked',
                             backgroundColor: stateOfContainer ? null : blue,
                             textColor: stateOfContainer ? black : white,
                             showCircle: !stateOfContainer,
@@ -64,9 +65,41 @@ class _ValidateTicketViewState extends State<ValidateTicketView> {
               ),
               Expanded(
                   child: ListView.builder(
-                itemCount: 5,
+                itemCount: !buttonState.isChecked ? 5 : 3,
                 itemBuilder: (context, index) {
-                  return _ticketTile();
+                  return Dismissible(
+                    key: const Key('Dismiss'),
+                    onDismissed: (direction) {
+                      // Remove the item from the data source.
+                      setState(() {});
+                      // Then show a snackbar.
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text(' dismissed')));
+                    },
+                    background: Container(
+                        color: green,
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text('Swipe to Check'),
+                          ),
+                        )),
+                    secondaryBackground: Container(
+                        color: green,
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text('Swipe to Check'),
+                          ),
+                        )),
+                    child: _ticketTile(
+                      tNumber: 2345468,
+                      numberP: 3,
+                      luggage: !buttonState.isChecked ? 'None' : 'Large',
+                    ),
+                  );
                 },
               ))
             ],
@@ -76,32 +109,36 @@ class _ValidateTicketViewState extends State<ValidateTicketView> {
     );
   }
 
-  Widget _ticketTile() {
+  Widget _ticketTile({
+    required int tNumber,
+    required int numberP,
+    required String luggage,
+  }) {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => const TicketDetailView(),
         ));
       },
-      child: const Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.0),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Material(
           child: Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                TextInColumn(label: 'Ticket Number: ', sub: 'sub'),
-                Dash(
+                TextInColumn(label: 'Ticket Number: ', sub: '$tNumber'),
+                const Dash(
                   direction: Axis.vertical,
                   length: 35,
                 ),
-                TextInColumn(label: 'No. passengers: ', sub: 'sub'),
-                Dash(
+                TextInColumn(label: 'No. passengers: ', sub: '$numberP'),
+                const Dash(
                   direction: Axis.vertical,
                   length: 35,
                 ),
-                TextInColumn(label: 'Luggage: ', sub: 'sub'),
+                TextInColumn(label: 'Luggage: ', sub: luggage),
               ],
             ),
           ),

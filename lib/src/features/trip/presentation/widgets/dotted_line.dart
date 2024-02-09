@@ -1,65 +1,57 @@
+import 'package:bookihub/src/shared/utils/exports.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dash/flutter_dash.dart';
 
-class DottedLine extends StatelessWidget {
-  final double height;
+class CustomDottedLine extends StatelessWidget {
   final Color color;
   final double dotRadius;
   final double spacing;
 
-  const DottedLine({
-    Key? key,
-    required this.height,
+  const CustomDottedLine({
+    super.key,
     this.color = Colors.black,
-    this.dotRadius = 3,
-    this.spacing = 5,
-  }) : super(key: key);
+    this.dotRadius = 1.5,
+    this.spacing = 4.0,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: Size(double.infinity, height),
-      painter: DottedLinePainter(color: color, dotRadius: dotRadius, spacing: spacing),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _Dot(color: color, radius: dotRadius * 1.5),
+        // SizedBox(width: spacing),
+        Dash(
+          length: MediaQuery.of(context).size.width * .06,
+          dashColor: grey,
+          dashThickness: 3,
+          dashLength: 2,
+        ),
+        // SizedBox(width: spacing),
+        _Dot(color: color, radius: dotRadius * 1.5),
+      ],
     );
   }
 }
 
-class DottedLinePainter extends CustomPainter {
+class _Dot extends StatelessWidget {
   final Color color;
-  final double dotRadius;
-  final double spacing;
+  final double radius;
 
-  DottedLinePainter({required this.color, required this.dotRadius, required this.spacing});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()..color = color;
-    final double halfDotRadius = dotRadius / 2;
-
-    for (double i = 0; i < size.width; i += spacing * 2) {
-      canvas.drawCircle(Offset(i, size.height / 2), halfDotRadius, paint);
-    }
-  }
+  const _Dot({
+    required this.color,
+    required this.radius,
+  });
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
+  Widget build(BuildContext context) {
+    return Container(
+      width: radius * 2,
+      height: radius * 2,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: grey,
+      ),
+    );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: Scaffold(
-      appBar: AppBar(
-        title: Text('Dotted Line with Circular Endings'),
-      ),
-      body: Center(
-        child: DottedLine(
-          height: 2,
-          color: Colors.black,
-          dotRadius: 3,
-          spacing: 5,
-        ),
-      ),
-    ),
-  ));
 }

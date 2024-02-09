@@ -2,8 +2,9 @@ import 'package:bookihub/src/features/trip/presentation/widgets/text_in_column.d
 import 'package:bookihub/src/shared/constant/dimensions.dart';
 import 'package:bookihub/src/shared/utils/exports.dart';
 import 'package:bookihub/src/shared/widgets/custom_button.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
+
+import '../../widgets/dotted_line.dart';
 
 class TicketDetailView extends StatefulWidget {
   const TicketDetailView({super.key});
@@ -43,21 +44,21 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge!
-                                    .copyWith(color: blue, fontSize: 18),
+                                    .copyWith(
+                                        color: const Color(0xff294783),
+                                        fontSize: 18),
                               ),
-                              const Dash(
-                                length: 60,
-                              ),
+                              const CustomDottedLine(),
                               Image.asset('assets/icons/bus.png'),
-                              const Dash(
-                                length: 60,
-                              ),
+                              const CustomDottedLine(),
                               Text(
                                 'Where to',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge!
-                                    .copyWith(color: blue, fontSize: 18),
+                                    .copyWith(
+                                        color: const Color(0xff294783),
+                                        fontSize: 18),
                               ),
                             ],
                           ),
@@ -71,8 +72,11 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                     vSpace,
                     vSpace,
                     vSpace,
-                    const Dash(
-                      length: 350,
+                    Dash(
+                      length: MediaQuery.of(context).size.width / 1.2,
+                      dashColor: grey,
+                      dashThickness: 3,
+                      dashLength: 2,
                     ),
                     vSpace,
                     vSpace,

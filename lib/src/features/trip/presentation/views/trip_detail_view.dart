@@ -1,5 +1,4 @@
 import 'package:bookihub/src/features/trip/presentation/provider/trip_provider.dart';
-import 'package:bookihub/src/features/trip/presentation/views/ticket_validation_view.dart';
 import 'package:bookihub/src/features/trip/presentation/views/trip_started.dart';
 import 'package:bookihub/src/shared/constant/dimensions.dart';
 import 'package:bookihub/src/shared/utils/alert_dialog.dart';
@@ -14,6 +13,8 @@ import 'package:bookihub/src/features/trip/presentation/widgets/trip_inspect_row
 import 'package:bookihub/src/features/trip/domain/entities/trip_model.dart';
 import 'package:provider/provider.dart';
 import 'package:bookihub/src/shared/constant/model.dart';
+
+import 'ticket_view/ticket_validation_view.dart';
 
 class TripDetails extends StatefulWidget {
   const TripDetails({super.key, required this.trip});
@@ -299,7 +300,7 @@ class _TripDetailsState extends State<TripDetails> {
                 ]),
               ),
             ),
-            const Spacer(),
+            vSpace,
             SizedBox(
               height: 35,
               child: CustomButton(
@@ -346,6 +347,7 @@ class _TripDetailsState extends State<TripDetails> {
                         : 'Submit Inspections'),
               ).loading(context.watch<TripProvider>().isUpdating),
             ),
+            vSpace,
             const Spacer(),
             SizedBox(
               height: MediaQuery.sizeOf(context).height * .07,
