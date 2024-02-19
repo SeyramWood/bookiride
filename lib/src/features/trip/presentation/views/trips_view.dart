@@ -1,4 +1,5 @@
 import 'package:bookihub/src/features/authentication/presentation/view/login_view.dart';
+import 'package:bookihub/src/features/authentication/presentation/view/update_password_form.dart';
 import 'package:bookihub/src/features/trip/presentation/views/completed_trip_view.dart';
 import 'package:bookihub/src/features/trip/presentation/views/scheduled_trip_view.dart';
 import 'package:bookihub/src/features/trip/presentation/views/todays_trip_view.dart';
@@ -24,7 +25,7 @@ class _TripsViewState extends State<TripsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bg,
+      backgroundColor: bgColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: hPadding),
@@ -34,29 +35,106 @@ class _TripsViewState extends State<TripsView> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                      onPressed: () {
-                        showCustomDialog(context,
-                            const Text('By continuing will log you out'),
-                            () async {
-                          storage.deleteAll();
-                          var pref = await SharedPreferences.getInstance();
-                          pref.clear();
-
-                          if (mounted) {
-                            showCustomSnackBar(
-                                context, 'successfully logged out', green);
-                            Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginView(),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => Dialog(
+                          child: Container(
+                            height: MediaQuery.of(context).size.height / 4,
+                            padding: EdgeInsets.all(15),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                //update password
+                                GestureDetector(
+                                  onTap: () {
+                                    if (mounted) {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              PasswordUpdateForm(),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Update password"),
+                                      Icon(Icons.update)
+                                    ],
+                                  ),
                                 ),
-                                (route) => false);
-                          }
-                        });
-                      },
-                      icon: const Icon(
-                        Icons.power_settings_new_rounded,
-                        color: orange,
-                      ))
+                                vSpace,
+                                vSpace,
+                                vSpace,
+                                //logout button
+                                GestureDetector(
+                                  onTap: () async {
+                                    storage.deleteAll();
+                                    var pref =
+                                        await SharedPreferences.getInstance();
+                                    pref.clear();
+
+                                    if (mounted) {
+                                      showCustomSnackBar(context,
+                                          'successfully logged out', green);
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const LoginView(),
+                                          ),
+                                          (route) => false);
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Logout",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium!
+                                            .copyWith(color: orange),
+                                      ),
+                                      Icon(
+                                        Icons.logout,
+                                        color: orange,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                      // showCustomDialog(
+                      //     context, const Text('By continuing will log you out'),
+                      //     () async {
+                      //   storage.deleteAll();
+                      //   var pref = await SharedPreferences.getInstance();
+                      //   pref.clear();
+                      //
+                      //   if (mounted) {
+                      //     showCustomSnackBar(
+                      //         context, 'successfully logged out', green);
+                      //     Navigator.of(context).pushAndRemoveUntil(
+                      //         MaterialPageRoute(
+                      //           builder: (context) => const LoginView(),
+                      //         ),
+                      //         (route) => false);
+                      //   }
+                      // });
+                    },
+                    icon: const Icon(
+                      Icons.power_settings_new_rounded,
+                      color: orange,
+                    ),
+                  ),
                 ],
               ),
               // vSpace,

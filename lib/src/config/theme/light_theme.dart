@@ -9,7 +9,7 @@ class LightTheme {
       appBarTheme: const AppBarTheme(
         color: white,
       ),
-      scaffoldBackgroundColor: bg,
+      scaffoldBackgroundColor: bgColor,
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
           shape: MaterialStateProperty.all(

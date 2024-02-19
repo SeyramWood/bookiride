@@ -44,7 +44,7 @@ class _TripStartedViewState extends State<TripStartedView> {
         centerTitle: true,
         title: Text("Trip Details",
             style: Theme.of(context).textTheme.headlineMedium!),
-        backgroundColor: bg,
+        backgroundColor: bgColor,
         actions: [
           GestureDetector(
             onTap: () {

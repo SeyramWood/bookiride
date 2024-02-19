@@ -34,7 +34,7 @@ class _TripTrackingViewState extends State<TripTrackingView> {
         centerTitle: true,
         title: Text("Trip Route",
             style: Theme.of(context).textTheme.headlineMedium!),
-        backgroundColor: bg,
+        backgroundColor: bgColor,
       ),
       body: injectedMap(),
     );

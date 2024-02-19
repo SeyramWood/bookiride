@@ -12,7 +12,7 @@ class ReportView extends StatelessWidget {
         centerTitle: true,
         title: Text('Incident Report',
             style: Theme.of(context).textTheme.headlineMedium!),
-        backgroundColor: bg,
+        backgroundColor: bgColor,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
