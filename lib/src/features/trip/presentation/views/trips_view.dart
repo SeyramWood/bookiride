@@ -50,6 +50,7 @@ class _TripsViewState extends State<TripsView> {
                                 GestureDetector(
                                   onTap: () {
                                     if (mounted) {
+                                      Navigator.of(context).pop();
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
                                           builder: (context) =>

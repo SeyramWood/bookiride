@@ -1,4 +1,6 @@
 import 'package:bookihub/src/features/authentication/presentation/provider/auth_provider.dart';
+import 'package:bookihub/src/features/authentication/presentation/view/reset_password_form.dart';
+import 'package:bookihub/src/shared/constant/dimensions.dart';
 import 'package:bookihub/src/shared/utils/button_extension.dart';
 import 'package:bookihub/src/shared/utils/exports.dart';
 import 'package:bookihub/src/shared/utils/show.snacbar.dart';
@@ -60,7 +62,16 @@ class _LoginViewState extends State<LoginView> {
               child: Form(
                 key: formKey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      "username",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: orange),
+                    ),
+                    vSpace,
                     TextFormField(
                       controller: emailController,
                       validator: (value) => validateEmail(value!),
@@ -79,6 +90,14 @@ class _LoginViewState extends State<LoginView> {
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.02,
                     ),
+                    Text(
+                      "Password",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: orange),
+                    ),
+                    vSpace,
                     TextFormField(
                       controller: passwordController,
                       validator: (value) {
@@ -114,8 +133,27 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.06,
+                      height: MediaQuery.of(context).size.height * 0.02,
                     ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                PasswordResetForm(),
+                          ),
+                        );},
+                        child: Text(
+                          "Forgot password",
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(color: orange),
+                        ),
+                      ),
+                    ),
+                    vSpace,
                     CustomButton(
                       bgColor: orange,
                       onPressed: () async {

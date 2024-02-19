@@ -27,4 +27,38 @@ class AuthRepoImpl implements AuthRepo {
       return Left(Failure('something went wrong'));
     }
   }
+
+  @override
+  Future<Either<Failure, String>> resetPassword(String oldPassword, String password, String repeatPassword) async {
+    try {
+      final result = await api.resetPassword(oldPassword, password, repeatPassword);
+      return Right(result);
+    } on CustomException catch (failure) {
+      return Left(Failure(failure.message));
+    } on SocketException catch (se) {
+      return Left(Failure(
+          se.message == "Failed host lookup: 'devapi.bookihub.com'"
+              ? "You are offline. Connect and retry"
+              : se.message));
+    } catch (e) {
+      return Left(Failure('something went wrong'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> updatePassword(String email, String password, String repeatPassword) async {
+    try {
+      final result = await api.updatePassword(email, password, repeatPassword);
+      return Right(result);
+    } on CustomException catch (failure) {
+      return Left(Failure(failure.message));
+    } on SocketException catch (se) {
+      return Left(Failure(
+          se.message == "Failed host lookup: 'devapi.bookihub.com'"
+              ? "You are offline. Connect and retry"
+              : se.message));
+    } catch (e) {
+      return Left(Failure('something went wrong'));
+    }
+  }
 }

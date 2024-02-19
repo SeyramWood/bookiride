@@ -58,4 +58,46 @@ class ApiService {
       rethrow;
     }
   }
+
+  Future<String> updatePassword(
+      String currentPassword, String password, String repeatPassword) async {
+    const url = "$baseUrl/auth/update-password";
+    final body = {
+      "currentPassword": currentPassword,
+      "newPassword": password,
+      "confirmNewPassword": repeatPassword,
+    };
+    try {
+      final response = await http.put(Uri.parse(url),body: body);
+      log(body.toString());
+      if (response.statusCode != 200) {
+        final message = jsonDecode(response.body)['message'];
+        throw CustomException(message);
+      }
+      return jsonDecode(response.body)['message'];
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> resetPassword(
+      String email, String password, String repeatPassword) async {
+    const url = "$baseUrl/auth/reset-password";
+    final body = {
+      "username": email,
+      "newPassword": password,
+      "confirmNewPassword": repeatPassword,
+    };
+    try {
+      final response = await http.put(Uri.parse(url),body: body);
+      log(response.body);
+      if (response.statusCode != 200) {
+        final message = jsonDecode(response.body)['error'];
+        throw CustomException(message);
+      }
+      return jsonDecode(response.body)['message'];
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

@@ -1,42 +1,44 @@
+import 'dart:developer';
+
+import 'package:bookihub/src/features/authentication/presentation/provider/auth_provider.dart';
+import 'package:bookihub/src/shared/constant/colors.dart';
 import 'package:bookihub/src/shared/utils/button_extension.dart';
+import 'package:bookihub/src/shared/utils/show.snacbar.dart';
+import 'package:bookihub/src/shared/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../shared/constant/colors.dart';
-import '../../../../shared/utils/show.snacbar.dart';
-import '../../../../shared/widgets/custom_button.dart';
-import '../provider/auth_provider.dart';
-
-class PasswordUpdateForm extends StatefulWidget {
+class PasswordResetForm extends StatefulWidget {
   @override
-  _PasswordUpdateFormState createState() => _PasswordUpdateFormState();
+  _PasswordResetFormState createState() => _PasswordResetFormState();
 }
 
-class _PasswordUpdateFormState extends State<PasswordUpdateForm> {
+class _PasswordResetFormState extends State<PasswordResetForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _repeatPasswordController = TextEditingController();
+  final TextEditingController _repeatPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Password Update'),
+        title: Text('Password Reset'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextFormField(
-                controller: _currentPasswordController,
-                decoration: InputDecoration(labelText: 'Current Password'),
+                controller: _userNameController,
+                decoration: InputDecoration(labelText: 'Username'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your old password';
+                    return 'Please enter your username';
                   }
                   return null;
                 },
@@ -72,25 +74,26 @@ class _PasswordUpdateFormState extends State<PasswordUpdateForm> {
                   if (_formKey.currentState!.validate()) {
                     await context
                         .read<AuthProvider>()
-                        .updatePassword(
-                      _currentPasswordController.text,
-                      _passwordController.text,
-                      _repeatPasswordController.text,
-                    )
+                        .resetPassword(
+                          _userNameController.text,
+                          _passwordController.text,
+                          _repeatPasswordController.text,
+                        )
                         .then((value) {
                       value.fold(
-                              (l) => showCustomSnackBar(
+                          (l) => showCustomSnackBar(
                               context, l.message, orange),
-                              (r) {
-                            showCustomSnackBar(
-                                context, 'Password updated successfully', green);
-                            Navigator.of(context).pop();
-                          });
+                          (r) {
+                        showCustomSnackBar(
+                            context, 'Password reset successfully', green);
+                        clearField();
+                        Navigator.of(context).pop();
+                      });
                     });
                   }
                 },
-                child: Text('Update Password'),
-              ).loading(context.watch<AuthProvider>().isUpdating),
+                child: Text('Reset Password'),
+              ).loading(context.watch<AuthProvider>().isResetting),
             ],
           ),
         ),
@@ -100,10 +103,15 @@ class _PasswordUpdateFormState extends State<PasswordUpdateForm> {
 
   @override
   void dispose() {
+    _userNameController.dispose();
     _passwordController.dispose();
     _repeatPasswordController.dispose();
-    _currentPasswordController.dispose();
     super.dispose();
   }
-}
 
+  void clearField() {
+    _repeatPasswordController.clear();
+    _passwordController.clear();
+    _userNameController.clear();
+  }
+}
