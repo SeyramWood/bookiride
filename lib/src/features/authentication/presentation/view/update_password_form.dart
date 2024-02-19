@@ -1,31 +1,44 @@
 import 'package:bookihub/src/shared/utils/button_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../shared/constant/colors.dart';
+import '../../../../shared/utils/interceptor.dart';
 import '../../../../shared/utils/show.snacbar.dart';
 import '../../../../shared/widgets/custom_button.dart';
 import '../provider/auth_provider.dart';
+import 'login_view.dart';
 
 class PasswordUpdateForm extends StatefulWidget {
+  const PasswordUpdateForm({super.key});
+
   @override
-  _PasswordUpdateFormState createState() => _PasswordUpdateFormState();
+  State<PasswordUpdateForm> createState() {
+    return _PasswordUpdateFormState();
+  }
 }
 
 class _PasswordUpdateFormState extends State<PasswordUpdateForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _currentPasswordController =
+      TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _repeatPasswordController = TextEditingController();
+  final TextEditingController _repeatPasswordController =
+      TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Password Update'),
+        title: const Text('Password Update'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -33,7 +46,8 @@ class _PasswordUpdateFormState extends State<PasswordUpdateForm> {
             children: [
               TextFormField(
                 controller: _currentPasswordController,
-                decoration: InputDecoration(labelText: 'Current Password'),
+                decoration:
+                    const InputDecoration(labelText: 'Current Password'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your old password';
@@ -43,7 +57,7 @@ class _PasswordUpdateFormState extends State<PasswordUpdateForm> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -54,7 +68,7 @@ class _PasswordUpdateFormState extends State<PasswordUpdateForm> {
               ),
               TextFormField(
                 controller: _repeatPasswordController,
-                decoration: InputDecoration(labelText: 'Repeat Password'),
+                decoration: const InputDecoration(labelText: 'Repeat Password'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -66,30 +80,41 @@ class _PasswordUpdateFormState extends State<PasswordUpdateForm> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               CustomButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     await context
                         .read<AuthProvider>()
                         .updatePassword(
-                      _currentPasswordController.text,
-                      _passwordController.text,
-                      _repeatPasswordController.text,
-                    )
+                          _currentPasswordController.text,
+                          _passwordController.text,
+                          _repeatPasswordController.text,
+                        )
                         .then((value) {
                       value.fold(
-                              (l) => showCustomSnackBar(
-                              context, l.message, orange),
-                              (r) {
-                            showCustomSnackBar(
-                                context, 'Password updated successfully', green);
-                            Navigator.of(context).pop();
-                          });
+                          (l) => showCustomSnackBar(context, l.message, orange),
+                          (r) async {
+                        storage.deleteAll();
+                        var pref = await SharedPreferences.getInstance();
+                        pref.clear();
+
+                        if (mounted) {
+                          Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const LoginView(),
+                              ),
+                              );
+                          showCustomSnackBar(
+                              context,
+                              'Password updated successfully.Log in with your new password',
+                              green);
+                        }
+                      });
                     });
                   }
                 },
-                child: Text('Update Password'),
+                child: const Text('Update Password'),
               ).loading(context.watch<AuthProvider>().isUpdating),
             ],
           ),
@@ -106,4 +131,3 @@ class _PasswordUpdateFormState extends State<PasswordUpdateForm> {
     super.dispose();
   }
 }
-

@@ -41,7 +41,7 @@ class _TripsViewState extends State<TripsView> {
                         builder: (context) => Dialog(
                           child: Container(
                             height: MediaQuery.of(context).size.height / 4,
-                            padding: EdgeInsets.all(15),
+                            padding: const EdgeInsets.all(15),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -54,12 +54,12 @@ class _TripsViewState extends State<TripsView> {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              PasswordUpdateForm(),
+                                              const PasswordUpdateForm(),
                                         ),
                                       );
                                     }
                                   },
-                                  child: Row(
+                                  child: const Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
@@ -101,7 +101,7 @@ class _TripsViewState extends State<TripsView> {
                                             .bodyMedium!
                                             .copyWith(color: orange),
                                       ),
-                                      Icon(
+                                      const Icon(
                                         Icons.logout,
                                         color: orange,
                                       )

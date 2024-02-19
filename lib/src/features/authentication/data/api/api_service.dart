@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bookihub/main.dart';
+import 'package:bookihub/src/features/trip/data/api/api_service.dart';
 import 'package:bookihub/src/shared/constant/base_url.dart';
 import 'package:bookihub/src/shared/errors/custom_exception.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   final storage = locator<FlutterSecureStorage>();
@@ -53,6 +55,7 @@ class ApiService {
       }
       log(response.body);
       final jsonID = jsonDecode(response.body)['data']['id'];
+
       return jsonID.toString();
     } catch (e) {
       rethrow;
@@ -61,6 +64,7 @@ class ApiService {
 
   Future<String> updatePassword(
       String currentPassword, String password, String repeatPassword) async {
+    final prefs = await SharedPreferences.getInstance();
     const url = "$baseUrl/auth/update-password";
     final body = {
       "currentPassword": currentPassword,
@@ -68,11 +72,11 @@ class ApiService {
       "confirmNewPassword": repeatPassword,
     };
     try {
-      final response = await http.put(Uri.parse(url),body: body);
+      final response = await client.put(url,body: body);
       log(body.toString());
       if (response.statusCode != 200) {
         final message = jsonDecode(response.body)['message'];
-        throw CustomException(message);
+        throw CustomException(response.body);
       }
       return jsonDecode(response.body)['message'];
     } catch (e) {
