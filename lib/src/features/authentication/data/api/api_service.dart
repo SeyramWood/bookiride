@@ -64,7 +64,6 @@ class ApiService {
 
   Future<String> updatePassword(
       String currentPassword, String password, String repeatPassword) async {
-    final prefs = await SharedPreferences.getInstance();
     const url = "$baseUrl/auth/update-password";
     final body = {
       "currentPassword": currentPassword,
@@ -72,11 +71,10 @@ class ApiService {
       "confirmNewPassword": repeatPassword,
     };
     try {
-      final response = await client.put(url,body: body);
-      log(body.toString());
+      final response = await client.put(url, body: body);
       if (response.statusCode != 200) {
-        final message = jsonDecode(response.body)['message'];
-        throw CustomException(response.body);
+        final message = jsonDecode(response.body)['error'];
+        throw CustomException(message);
       }
       return jsonDecode(response.body)['message'];
     } catch (e) {
@@ -93,7 +91,7 @@ class ApiService {
       "confirmNewPassword": repeatPassword,
     };
     try {
-      final response = await http.put(Uri.parse(url),body: body);
+      final response = await http.put(Uri.parse(url), body: body);
       log(response.body);
       if (response.statusCode != 200) {
         final message = jsonDecode(response.body)['error'];

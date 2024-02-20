@@ -95,16 +95,19 @@ class _PasswordUpdateFormState extends State<PasswordUpdateForm> {
                       value.fold(
                           (l) => showCustomSnackBar(context, l.message, orange),
                           (r) async {
+                        //refresh token to prevent unauthorised access
+                       // await refreshAccessToken();
                         storage.deleteAll();
                         var pref = await SharedPreferences.getInstance();
                         pref.clear();
 
                         if (mounted) {
-                          Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const LoginView(),
-                              ),
-                              );
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (context) => const LoginView(),
+                                ),(route)=> false
+                          );
+                          // Navigator.of(context).pop();
                           showCustomSnackBar(
                               context,
                               'Password updated successfully.Log in with your new password',
